@@ -15,12 +15,11 @@ public class Main {
         Set<Character> bukva = new LinkedHashSet<>(List.of(
                 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
         ));
-
         try (BufferedReader reader = new BufferedReader(new FileReader("words.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                if (line.length() == 5 && line.matches("[a-zA-Z]+")) {
+                if (line.length() == 5) {
                     String lower = line.toLowerCase();
                     boolean isUnique = true;
                     boolean[] seen = new boolean[26];
@@ -29,7 +28,7 @@ public class Main {
                     for (int i = 0; i < 5; i++) {
                         char c = lower.charAt(i);
                         int idx = c - 'a';
-                        if (seen[idx]) {
+                        if (idx < 0 || idx >= 26 || seen[idx]) {
                             isUnique = false;
                             break;
                         }
@@ -45,7 +44,9 @@ public class Main {
             boolean anyChanged=false;
             for (List<Character> uniqueLetters:words) {
                 if (bukva.containsAll(uniqueLetters)) {
-                    bukva.removeAll(uniqueLetters);
+                    for (Character c : uniqueLetters) {
+                        bukva.remove(c);
+                    }
                     uniqueWords.add(uniqueLetters.toString());
                     anyChanged = true;
                 }
@@ -54,9 +55,9 @@ public class Main {
                 break;
             }
         }
-        System.out.println(uniqueWords);
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken: " + (endTime - startTime) + " milliseconds");
+        System.out.println(uniqueWords);
         System.out.println("Unused letters: " + bukva);
 
     }

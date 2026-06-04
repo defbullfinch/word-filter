@@ -44,7 +44,9 @@ public class Main {
             boolean anyChanged=false;
             for (List<Character> uniqueLetters:words) {
                 if (bukva.containsAll(uniqueLetters)) {
-                    bukva.removeAll(uniqueLetters);
+                    for (Character c : uniqueLetters) {
+                        bukva.remove(c);
+                    }
                     uniqueWords.add(uniqueLetters.toString());
                     anyChanged = true;
                 }

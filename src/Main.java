@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,40 +10,48 @@ public class Main {
 
         List<String> uniqueWords = new ArrayList<>();
 
-        List<String> words = new ArrayList<>();
+        List<List<Character>> words = new ArrayList<>();
 
-        List<Character> bukva = new ArrayList<>(List.of('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'));
+        Set<Character> bukva = new LinkedHashSet<>(List.of(
+                'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
+        ));
+
         try (BufferedReader reader = new BufferedReader(new FileReader("words.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                if (!line.isEmpty() && line.matches("[a-zA-Z]+")) {
-                    words.add(line);
+                if (line.length() == 5 && line.matches("[a-zA-Z]+")) {
+                    String lower = line.toLowerCase();
+                    boolean isUnique = true;
+                    boolean[] seen = new boolean[26];
+                    List<Character> uniqueLetters = new ArrayList<>(5);
+
+                    for (int i = 0; i < 5; i++) {
+                        char c = lower.charAt(i);
+                        int idx = c - 'a';
+                        if (seen[idx]) {
+                            isUnique = false;
+                            break;
+                        }
+                        seen[idx] = true;
+                        uniqueLetters.add(c);
+                    }
+                    if (isUnique){words.add(uniqueLetters);
+                    }
                 }
             }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-
-
-        while (bukva.size() > 1) {
-            for (String w : words) {
-                String lower = w.toLowerCase();
-                if (lower.length() != 5) continue;
-                boolean isUnique = lower.chars()
-                        .distinct()
-                        .count() == lower.length();
-// System.out.println(isUnique);
-                if (!isUnique) continue;
-                List<Character> uniqueLetters = lower.chars()
-                        .mapToObj(c -> (char) c)
-                        .collect(Collectors.toList());
-
+        } catch (IOException e) {System.out.println(e.getMessage());}
+        while(bukva.size() > 1){
+            boolean anyChanged=false;
+            for (List<Character> uniqueLetters:words) {
                 if (bukva.containsAll(uniqueLetters)) {
                     bukva.removeAll(uniqueLetters);
                     uniqueWords.add(uniqueLetters.toString());
+                    anyChanged = true;
                 }
-
+            }
+            if (!anyChanged) {
+                break;
             }
         }
         System.out.println(uniqueWords);
